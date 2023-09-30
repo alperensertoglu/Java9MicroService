@@ -1,0 +1,101 @@
+/**
+ * ROOT build.gradle file:
+ */
+plugins {
+    /**
+     * Buraya yazılan özellikler tüm diğer servislerde etkili olacak.
+     * Diğerlerinde hiç yazmasak bile geçerli olacak bunlar.
+     */
+    id 'java'
+    id 'org.springframework.boot' version '2.7.12'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'application'
+    id 'java-library'
+}
+
+allprojects {
+    /**
+     * tüm projelere(root+sub) pluginleri atamak için:
+     */
+    apply from  :  "${rootDir}/dependencies.gradle"
+    apply plugin: 'application'
+    group = 'com.barisd'
+    version = 'v.0.1'
+    sourceCompatibility = JavaVersion.VERSION_19
+    targetCompatibility=JavaVersion.VERSION_19
+}
+
+subprojects {
+    /**
+     * sadece sub
+     * Bütün alt projelerimde group ve version adı ile
+     * diğer özelliklerin aynı olması için:
+     */
+
+    tasks.withType(JavaCompile).tap {
+        configureEach {
+            options.encoding = 'UTF-8'
+        }
+    }
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    apply plugin: 'java-library'
+
+    buildscript {
+        dependencies {
+            classpath("org.springframework.boot:spring-boot-gradle-plugin:${versions.springBoot}")
+        }
+    }
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+        google()
+    }
+    buildscript {
+        repositories {
+            mavenCentral()
+        }
+    }
+    dependencies {
+        /**
+         * bütün projeye yayılacak bağımlıkları yazıyoruz.
+         * Yazarken libs içindekileri çekiyoruz.
+         * Bütün projelere entegre gelecek.
+         */
+        implementation libs.springBootWeb
+        compileOnly libs.lombok
+        annotationProcessor libs.lombok
+        implementation libs.mapstruct
+        annotationProcessor libs.mapstructProcessor
+        implementation libs.swaggerApi
+        implementation libs.jwt
+
+        /**
+         * authMicroService için gerekli olan postgresql ve springBootDataJpa
+         * bağımlılıklarını buradan veremeyiz. Buraya yazdıklarımız tüm sub projelere aktarılır.
+         * Halbuki bazı projelerde farklı veritabanları kullanılmış olabilir.
+         * 2 farklı farklı veritabanı için DataJpa kullanılmayabilir. Mongo için farklı...
+         * postgresql farklı olabilir.
+         * Hepsini eklersek, o da olmaz. Gereksiz yere kullanılmayacak bağımlılığı direkt
+         * ekleyecek. Ayrıca her birini servislerde configure etmeni bekleyecek. Ancak bunlara gerek yok.
+         * Gidip sub build.gradle dosyasında çağırmak daha doğru olacaktır.
+         */
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+
+
+
+
+
+

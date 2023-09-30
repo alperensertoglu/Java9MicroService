@@ -1,0 +1,3 @@
+@echo off
+setx JAVA99_SECRETKEY "123456789"
+setx JAVA99_ISSUER "Java99"

@@ -1,0 +1,6 @@
+rootProject.name = 'Java9MicroService'
+include 'AuthMicroService'
+include 'UserProfileMicroService'
+include 'ProductMicroService'
+include 'SalesMicroService'
+
